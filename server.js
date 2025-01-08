@@ -167,6 +167,65 @@ app.post("/contact", async (req, res) => {
   }
 });
 
+// Registration Route
+app.post("/register", async (req, res) => {
+  const { firstName, lastName, email, password, courseInterest, userType } =
+    req.body;
+
+  const userSuccessEmailTemplate = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
+        <h2>Welcome to Instructo Africa!</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Hi ${firstName},</p>
+        <p>Thank you for registering with Instructo Africa. We’re thrilled to have you on board.</p>
+        <p>Your course of interest is: <strong>${courseInterest}</strong>.</p>
+        <p>We will get back to you shortly with more details.</p>
+        <p>Best regards,<br>Instructo Africa Team</p>
+      </div>
+    </div>
+  `;
+
+  const adminNotificationTemplate = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h2>New Registration Received</h2>
+      <p><strong>First Name:</strong> ${firstName}</p>
+      <p><strong>Last Name:</strong> ${lastName}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Course of Interest:</strong> ${courseInterest}</p>
+      <p><strong>User Type:</strong> ${userType}</p>
+    </div>
+  `;
+
+  try {
+    // Send success email to the user
+    await transporter.sendMail({
+      from: process.env.email,
+      to: email,
+      subject: "Registration Successful - Instructo Africa",
+      html: userSuccessEmailTemplate,
+    });
+
+    // Send registration details to admin
+    await transporter.sendMail({
+      from: process.env.email,
+      to: "admin@instructo.africa",
+      subject: "New Registration Notification",
+      html: adminNotificationTemplate,
+    });
+
+    res.status(200).send({ message: "Registration successful", status: 200 });
+  } catch (error) {
+    console.error("Error handling registration:", error);
+    res.status(500).send({
+      message: "Error processing registration",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
 // Root Route
 app.get("/", (req, res) => {
   res.send("App works fine ☺️");
