@@ -142,8 +142,22 @@ app.post("/contact", async (req, res) => {
     const info = await transporter.sendMail({
       from: process.env.email,
       to: email,
-      subject: "New Contact Form Submission",
+      subject: "Support Team | Instructo Africa",
       html: thanksMessage,
+      attachments: [
+        {
+          filename: "logo.png",
+          path: logoPath,
+          cid: "logo",
+        },
+      ],
+    });
+
+    const report = await transporter.sendMail({
+      from: process.env.email,
+      to: 'info@instructo.africa',
+      subject: "New Contact Form Submission",
+      html: contactEmailTemplate,
       attachments: [
         {
           filename: "logo.png",
@@ -210,7 +224,7 @@ app.post("/register", async (req, res) => {
     // Send registration details to admin
     await transporter.sendMail({
       from: process.env.email,
-      to: "admin@instructo.africa",
+      to: "info@instructo.africa",
       subject: "New Registration Notification",
       html: adminNotificationTemplate,
     });
